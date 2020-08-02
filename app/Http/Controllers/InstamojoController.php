@@ -25,7 +25,6 @@ class InstamojoController extends Controller
 
         $amount = $product->price * $cart_item->qnty;
 
-
         // create order record
         $order = UserOrders::create([
             'name' => $request->name,
@@ -33,6 +32,8 @@ class InstamojoController extends Controller
             'pincode' => $request->pincode,
             'phone_no' => $request->phone,
             'seller_id' => $product->seller_id,
+            'state' => $request->state,
+            'city' =>$request->city,
             'user_id' => Auth::user()->id,
             'product_id' => $product->id,
             'total_amnt' => $amount,

@@ -26,9 +26,6 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->integer('role')->default(3);
-            // gps details
-            $table->decimal('long', 10, 7)->nullable();
-            $table->decimal('lat', 10, 7)->nullable();
         });
     }
 

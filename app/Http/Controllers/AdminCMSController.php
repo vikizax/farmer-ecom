@@ -210,10 +210,10 @@ class AdminCMSController extends Controller
 
                 break;
             case 'admin/CmsBottomAdStore' :
-                $bottomAds = CmsTopAd::get();
+                $bottomAds = CmsBottomAd::get();
                 $bottomAds_count = $bottomAds->count();
 
-                if ($bottomAds_count == 4) {
+                if ($bottomAds_count >= 4) {
                     return back()->with('error', 'Bottom Ads Limit exceeded! (Only 4 Bottom Ads is allowed, please delete existing to add new)');
                 }
 
