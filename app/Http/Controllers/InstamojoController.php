@@ -14,10 +14,22 @@ class InstamojoController extends Controller
 {
 
 
+    private $instamojo_api_key;
+    private $instamojo_auth_token;
+    private $instamojo_end_point;
+
+    function __construct()
+    {
+        $this->instamojo_api_key = env('INSTAMOJO_API_KEY');
+        $this->instamojo_auth_token = env('INSTAMOJO_AUTH_TOKEN');
+        $this->instamojo_end_point = env('INSTAMOJO_END_POINT');
+
+    }
+
     public function createRequest(Request $request, $id)
     {
 
-        $api = new Instamojo("test_30eb970c72d93f6b6632fdaa10d", "test_961b7591967320daf5c4f1c11fc", "https://test.instamojo.com/api/1.1/");
+        $api = new Instamojo($this->instamojo_api_key, $this->instamojo_auth_token, $this->instamojo_end_point);
 
         $cart_item = UserCart::findOrFail($id);
 
@@ -33,7 +45,7 @@ class InstamojoController extends Controller
             'phone_no' => $request->phone,
             'seller_id' => $product->seller_id,
             'state' => $request->state,
-            'city' =>$request->city,
+            'city' => $request->city,
             'user_id' => Auth::user()->id,
             'product_id' => $product->id,
             'total_amnt' => $amount,
@@ -72,7 +84,7 @@ class InstamojoController extends Controller
     public function thankyou(Request $request, $cart_id, $order_id)
     {
 
-        $api = new Instamojo("test_30eb970c72d93f6b6632fdaa10d", "test_961b7591967320daf5c4f1c11fc", "https://test.instamojo.com/api/1.1/");
+        $api = new Instamojo($this->instamojo_api_key, $this->instamojo_auth_token, $this->instamojo_end_point);
 
         $payment_id = $request->payment_id;
 
