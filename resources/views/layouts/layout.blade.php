@@ -105,9 +105,9 @@
                 <div class="container">
                     <a class="navbar-brand" href="{{route('home')}}">
                         <img
-                            src="{{ route('cmsNavbarBrandImage.show', \App\CmsNavbar::first()->image) }}"
+                            src="{{ \App\CmsNavbar::all()->isNotEmpty() ?  route('cmsNavbarBrandImage.show', \App\CmsNavbar::first()->image ) : '' }}"
                             style="width: 110px; height: 32px;"
-                            alt="brand-logo`"></a>
+                            alt="LOGO"></a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
                             aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -221,7 +221,7 @@
 
 @endunless
 
-@if(Request::is('/'))
+@if(Request::is('/', 'home'))
     <footer class="footer">
         <!-- Footer Top -->
         <div class="footer-top section">
@@ -231,9 +231,10 @@
                         <!-- Single Widget -->
                         <div class="single-footer about">
 
-                            <p class="text1">{{ $footer_content->footer_description }}</p>
+                            <p class="text1">{{ $footer_content ?$footer_content->footer_description : 'FOOTER DESC' }}</p>
                             <p class="call">Got Question? Call us 24/7<span><a
-                                        href="tel:123456789">+91 {{ $footer_content->contact_number }}</a></span></p>
+                                        href="tel:{{$footer_content ?$footer_content->contact_number : '9876543210'}}">+91 {{ $footer_content ?$footer_content->contact_number : '9876543210' }}</a></span>
+                            </p>
                         </div>
                         <!-- End Single Widget -->
                     </div>
@@ -272,9 +273,9 @@
                             <!-- Single Widget -->
                             <div class="contact">
                                 <ul>
-                                    <li>{{ $footer_content->location }}</li>
-                                    <li>{{ $footer_content->contact_email }}</li>
-                                    <li>+91 {{ $footer_content->contact_number }}</li>
+                                    <li>{{ $footer_content ?$footer_content->location : 'LOCATION'}}</li>
+                                    <li>{{ $footer_content ?$footer_content->contact_email : 'EMAIL' }}</li>
+                                    <li>+91 {{ $footer_content ? $footer_content->contact_number: '9876543210'}}</li>
                                 </ul>
                             </div>
                             <!-- End Single Widget -->
@@ -296,7 +297,7 @@
                 <div class="inner">
                     <div class="row">
                         <div class="col-12 text-center">
-                            {{ $footer_content->footer_copyright }}
+                            {{ $footer_content ? $footer_content->footer_copyright : 'COPYRIGHT' }}
                         </div>
                         {{--                        <div class="col-lg-6 col-12">--}}
                         {{--                            <div class="right">--}}

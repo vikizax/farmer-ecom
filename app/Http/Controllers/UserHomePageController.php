@@ -46,16 +46,22 @@ class UserHomePageController extends Controller
 
         $products = Product::where('approved', true)->inRandomOrder()->take(8)->get();
 
-        foreach ($products as $key => $product) {
 
-            $featured_products[$counter][$i_key] = $product;
-            $i_key++;
-            if ($key == 3) {
-                $counter = 1;
-                $i_key = 0;
+        if(!$products->isEmpty()) {
+            foreach ($products as $key => $product) {
+
+                $featured_products[$counter][$i_key] = $product;
+                $i_key++;
+                if ($key == 3) {
+                    $counter = 1;
+                    $i_key = 0;
+                }
+
             }
-
+        }else {
+            $featured_products = null;
         }
+
 
         // get the top 8 products who received most orders
         $orders = DB::table('user_orders')
@@ -81,16 +87,22 @@ class UserHomePageController extends Controller
 
             $data_set_product = Product::where('approved', true)->inRandomOrder()->take(8)->get();
 
-            foreach ($data_set_product as $key => $product) {
+            if(!$data_set_product->isEmpty()) {
+                foreach ($data_set_product as $key => $product) {
 
-                $best_selling_products[$counter_j][$key_j] = $product;
-                $key_j++;
-                if ($key == 3) {
-                    $counter_j = 1;
-                    $key_j = 0;
+                    $best_selling_products[$counter_j][$key_j] = $product;
+                    $key_j++;
+                    if ($key == 3) {
+                        $counter_j = 1;
+                        $key_j = 0;
+                    }
+
                 }
 
+            }else {
+                $best_selling_products = null;
             }
+
             $data = [
                 'featured_products' => $featured_products,
                 'banners' => $banners,
@@ -143,8 +155,10 @@ class UserHomePageController extends Controller
         $data['seller_count'] = $seller_count;
 
         if ($request->is('/')) {
-            $popup = CmsPopUp::first()->image;
-            alert()->image(null, null,route('cmsPopUpImage.show', $popup), '', '')->persistent();
+            if (CmsPopUp::all()->isNotEmpty()) {
+                $popup = CmsPopUp::first()->image;
+                alert()->image(null, null, route('cmsPopUpImage.show', $popup), '', '')->persistent();
+            }
 
 
         }
