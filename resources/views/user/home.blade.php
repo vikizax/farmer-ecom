@@ -1,4 +1,4 @@
-@extends('layouts.layout')
+@extends('layouts.layout', ['footer_content' => $footer_content])
 
 @section('content')
 
@@ -282,8 +282,48 @@
             </div>
     @endif
     <!-- END of Company Ad -->
+
+        <!--START OF COUNTER-->
+        <hr>
+        <section class="counter">
+            <div class="container">
+                <div class="row counter_row">
+                    <div class="column counter_column">
+                        <div class="card counter_card">
+                            <p><i class="fa fa-users counter_fa"></i></p>
+                            <h3>{{ $seller_count }}+</h3>
+                            <p>Sellers</p>
+                        </div>
+                    </div>
+                    <div class="column counter_column">
+                        <div class="card counter_card">
+                            <p><i class="fa fa-cart-plus counter_fa"></i></p>
+                            <h3>{{ $product_count }}+</h3>
+                            <p>Products</p>
+                        </div>
+                    </div>
+                    <div class="column counter_column">
+                        <div class="card counter_card">
+                            <p><i class="fa fa-comment counter_fa"></i></p>
+                            <h3>{{ $feedback_count }}+</h3>
+                            <p>Positive Feedback</p>
+                        </div>
+                    </div>
+
+                    <div class="column counter_column">
+                        <div class="card counter_card">
+                            <p><i class="fa fa-truck counter_fa"></i></p>
+                            <h3>{{ $order_count }}+</h3>
+                            <p>Products Delivered</p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </section>
+        <!--    END OF COUNTER-->
     </div>
-
-
 
 @endsection

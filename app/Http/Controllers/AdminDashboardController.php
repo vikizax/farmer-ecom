@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\CmsCustomerReview;
+use App\Feedback;
 use App\Notifications\ProductApproveNotification;
 use App\Notifications\ProductRejectNotification;
 use App\Notifications\SellerRegistrationRejectNotification;
@@ -100,6 +102,14 @@ class AdminDashboardController extends Controller
                 return view('admin.dashboard')->with(['page' => 'sellerAll', 'users' => $users]);
 
                 break;
+
+            case 'feedbacks':
+                $feedbacks = Feedback::get();
+
+                return view('admin.dashboard')->with(['page' => 'feedbackAll', 'feedbacks' => $feedbacks]);
+
+                break;
+
             case 'sellerAnalysis':
 
                 $data_set_seller = array();
@@ -194,24 +204,18 @@ class AdminDashboardController extends Controller
                 return view('admin.dashboard')->with(['page' => 'approveSellerMore', 'user' => $details]);
 
                 break;
-//            case 'productAnalysis':
-//                return view('admin.dashboard')->with('page', 'productAnalysis');
-//
-//                break;
-//            case 'sellerAnalysis':
-//                return view('admin.dashboard')->with('page', 'sellerAnalysis');
-//
-//                break;
-//            case 'userAnalysis':
-//                return view('admin.dashboard')->with('page', 'userAnalysis');
-//
-//                break;
+
             case 'editCategory':
                 $category = ProductCategory::findOrFail($id);
 
                 return view('admin.dashboard')->with(['page' => 'editCategory', 'category' => $category]);
 
                 break;
+
+            case 'feedbackDetails' :
+                $feedback = Feedback::findOrFail($id);
+
+                return view('admin.dashboard')->with(['page' => 'feedbackDetails', 'feedback' => $feedback]);
 
             default:
                 abort(404);
@@ -241,21 +245,38 @@ class AdminDashboardController extends Controller
     public function store(Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:product_category',
-        ], $messages = [
-            'unique' => 'Category already exist',
-        ]);
+        if (strpos($request->path(), 'addCategory') !== false) {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|unique:product_category',
+            ], $messages = [
+                'unique' => 'Category already exist',
+            ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator->messages());
+            if ($validator->fails()) {
+                return back()->withErrors($validator->messages());
+            }
+
+            ProductCategory::create([
+                'name' => $request->name
+            ]);
+
+            return redirect()->back()->with('success', 'Category added success!');
         }
 
-        ProductCategory::create([
-            'name' => $request->name
-        ]);
+        if (strpos($request->path(), 'feedbackToReviewStore') !== false) {
 
-        return redirect()->back()->with('success', 'Category added success!');
+            // add it to review table
+            CmsCustomerReview::create([
+                'name' => $request->name,
+                'review' => $request->feedback
+            ]);
+
+            // remove from feedback table
+            $feedback = Feedback::where('id', $request->id)->first();
+            $feedback->delete();
+
+            return redirect()->route('admin.index', 'feedbacks')->with('success', 'Feedback added to Customer Review');
+        }
     }
 
     /**
@@ -395,6 +416,13 @@ class AdminDashboardController extends Controller
             Notification::send($seller, new ProductRejectNotification());
 
             return redirect('/admin/approveProduct')->with('success', 'Product reject success');
+        } else if (strpos($request->path(), 'feedbackRemove') !== false) {
+            // remove from feedback table
+            $feedback = Feedback::where('id', $id)->first();
+            $feedback->delete();
+            
+            return redirect()->route('admin.index', 'feedbacks')->with('success', 'Feedback Removed Success');
+
         } else {
             abort(400);
         }

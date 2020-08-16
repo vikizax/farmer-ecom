@@ -20,6 +20,12 @@ Auth::routes(['verify' => true]);
 // Admin routes
 Route::middleware(['auth', 'isAdmin'])->group(function () {
 
+    // get CMS POP UP Form
+    Route::get('/admin/CmsPopUp', 'AdminCMSController@create')->name('admincms.popup');
+
+    // get CMS Navbar Form
+    Route::get('/admin/CmsNavbar', 'AdminCMSController@create')->name('admincms.navbar');
+
     // get CMS Banner Form
     Route::get('/admin/CmsBanner', 'AdminCMSController@create')->name('admincms.banner');
 
@@ -47,6 +53,12 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // get All Bottom Ad List
     Route::get('/admin/BottomAd', 'AdminCMSController@index')->name('admincms.bottomAdAll');
 
+    // CMS Navbar Pop Up Form save
+    Route::post('/admin/CmsPopUpStore', 'AdminCMSController@store')->name('admincms.popupStore');
+
+    // CMS Navbar Form save
+    Route::post('/admin/CmsNavbarStore', 'AdminCMSController@store')->name('admincms.navbarStore');
+
     // CMS Banner Form save
     Route::post('/admin/CmsBannerStore', 'AdminCMSController@store')->name('admincms.bannerStore');
 
@@ -58,6 +70,15 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
 
     // CMS Bottom Ad Form save
     Route::post('/admin/CmsBottomAdStore', 'AdminCMSController@store')->name('admincms.bottomAdStore');
+
+    // CMS Footer Form save
+    Route::post('/admin/CmsFooterStore', 'AdminCMSController@store')->name('admincms.footerStore');
+
+    // CMS Navbar Form update
+    Route::post('/admin/CmsNavbarUpdate/{id}', 'AdminCMSController@update')->name('admincms.navbarUpdate');
+
+    // CMS Footer Form update
+    Route::post('/admin/CmsFooterUpdate/{id}', 'AdminCMSController@update')->name('admincms.footerUpdate');
 
     // CMS Banner remove
     Route::delete('/admin/CmsBannerDelete/{id}', 'AdminCMSController@destroy')->name('admincms.bannerDelete');
@@ -83,6 +104,12 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // get more details | edit  on admin dashboard
     Route::get('/admin/{page}/{id}/{show?}', 'AdminDashBoardController@more')->name('admin.more');
 
+    // add feedback to review
+    Route::post('/admin/feedbackToReviewStore', 'AdminDashBoardController@store')->name('admin.feedbackToReview');
+
+    // delete feedback
+    Route::delete('/admin/feedbackRemove/{id}', 'AdminDashBoardController@destroy')->name('admin.feedbackDelete');
+
     // update category
     Route::post('/admin/updateCategory/{id}', 'AdminDashboardController@update')->name('admin.updateCategory');
 
@@ -93,13 +120,13 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::post('/admin/approveSeller/{id}', 'AdminDashboardController@update')->name('admin.sellerApprove');
 
     // deny user registration as seller
-    Route::post('/admin/rejectSeller/{id}', 'AdminDashboardController@destroy')->name('admin.sellerReject');
+    Route::delete('/admin/rejectSeller/{id}', 'AdminDashboardController@destroy')->name('admin.sellerReject');
 
     // approve product approval
     Route::post('/admin/approveProduct/{id}', 'AdminDashboardController@update')->name('admin.productApprove');
 
     // reject product approval
-    Route::post('/admin/rejectProduct/{id}', 'AdminDashboardController@destroy')->name('admin.productReject');
+    Route::delete('/admin/rejectProduct/{id}', 'AdminDashboardController@destroy')->name('admin.productReject');
 
 
     // get seller proof image
@@ -168,9 +195,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/webhook', 'InstamojoController@webhook');
 });
 
+// get home page with pop up banner
+Route::get('/', 'UserHomePageController@index');
 
-// get home page | admin dashboard | seller dashboard
-Route::get('/', 'UserHomePageController@index')->name('home');
+// get home page
+Route::get('/home', 'UserHomePageController@index')->name('home');
+
+// save feedback | Contact Us
+Route::post('/contactusStore', 'UserHomePageController@store')->name('contactus.store');
+
+// get feedback | Contact Us
+Route::get('/contactus', 'UserHomePageController@create')->name('contactus.create');
 
 // get products
 Route::get('/product/{filter?}/{search?}', 'UserProductPageController@index')->name('product.index');
@@ -209,4 +244,16 @@ Route::get('/storage/customer_review_image/{imageName}', [
 Route::get('/storage/bottomAd_image/{imageName}', [
     'as' => 'cmsBottomAdImage.show',
     'uses' => 'ImageControllerCmsBottomAd@show',
+]);
+
+// get CMS Navbar Brand image
+Route::get('/storage/navbar_brand_image/{imageName}', [
+    'as' => 'cmsNavbarBrandImage.show',
+    'uses' => 'ImageControllerCmsNavbar@show',
+]);
+
+// get CMS Pop Up Ad image
+Route::get('/storage/popup_ad_image/{imageName}', [
+    'as' => 'cmsPopUpImage.show',
+    'uses' => 'ImageControllerCmsPopUp@show',
 ]);

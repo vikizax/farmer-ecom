@@ -50,6 +50,10 @@
                             </li>
 
                             <li class="nav-item">
+                                <a class="nav-link" href="{{route('admin.index', 'feedbacks')}}">All Feedbacks</a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{route('admin.index', 'productAnalysis')}}">Product
                                     Analysis</a>
                             </li>
@@ -62,6 +66,15 @@
                         <hr class="visible-xs mt-3">
                         CMS MENU
                         <ul class="nav nav-pills flex-column">
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('admincms.popup') }}">Pop Up Form</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('admincms.navbar') }}">Navbar Form</a>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('admincms.banner') }}">Banner Form</a>
                             </li>
@@ -76,6 +89,10 @@
 
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('admincms.bottomAd')}}">Bottom Ad Form</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('admincms.footer')}}">Footer Form</a>
                             </li>
 
                             <li class="nav-item">
@@ -295,6 +312,7 @@
                                   method="POST"
                                   style="display: none;">
                                 @csrf
+                                @method('DELETE')
                             </form>
                         @endif
 
@@ -399,7 +417,7 @@
                             <tbody>
                             @foreach ($users as $user)
                                 <tr>
-                                    <td><a href="#">{{ $user->first_name }}</a></td>
+                                    <td>{{ $user->first_name }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>
                                         <a href="{{route('admin.more', ['page' => 'approveSeller','id' => $user->id,  'show' => true])}}"
@@ -436,6 +454,149 @@
                         </nav> --}}
                     </div>
                 </div>
+            @endif
+
+            @if ($page == 'feedbackAll')
+                <div class="col-md-9 content">
+                    <div class="dashhead">
+                        <div class="dashhead-titles">
+                            <h6 class="dashhead-subtitle">Dashboards</h6>
+                            <h2 class="dashhead-title">Feedbacks</h2>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table" data-sort="table">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>More Details</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach ($feedbacks as $feedback)
+                                <tr>
+                                    <td>{{ $feedback->name }}</td>
+                                    <td>{{ $feedback->contact_email }}</td>
+                                    <td>
+                                        <a href="{{route('admin.more', ['page' => 'feedbackDetails','id' => $feedback->id])}}"
+                                           class="btn btn-primary">Details</a></td>
+                                </tr>
+
+                            @endforeach
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <div class="text-center">
+                        {{-- <nav>
+                            <ul class="pagination">
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav> --}}
+                    </div>
+                </div>
+            @endif
+
+            @if ($page == 'feedbackDetails')
+
+                <div class="col-md-9 content">
+                    <div class="dashhead">
+                        <div class="dashhead-titles">
+                            <h6 class="dashhead-subtitle">Dashboards</h6>
+                            <h2 class="dashhead-title">Feedback Detials</h2>
+                        </div>
+                    </div>
+                    <div class="content-panel">
+                        <form class="mt-4" action="{{ route('admin.feedbackToReview') }}" method="POST">
+                            @csrf
+                            <fieldset class="fieldset">
+                                <div class="form-group">
+                                    <label class="col-md-2 col-sm-3 col-xs-12 control-label">Name</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <input type="text" class="form-control" value="{{ $feedback->name}}"
+                                               name="name"
+                                               readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2  col-sm-3 col-xs-12 control-label">Email</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <input readonly type="email" class="form-control"
+                                               value="{{ $feedback->contact_email}}"
+                                               name="contact_email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2  col-sm-3 col-xs-12 control-label">Phone Number</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <input readonly type="phone" class="form-control"
+                                               value="{{ $feedback->contact_number}}"
+                                               name="contact_number">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2  col-sm-3 col-xs-12 control-label">Feedback</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <textarea name="feedback" rows="4" cols="50" class="form-control"
+                                                  readonly>{{ $feedback->feedback }}</textarea>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <hr>
+                            <input readonly type="number" class="form-control"
+                                   value="{{ $feedback->id}}"
+                                   name="id"
+                                   style="display: none;">
+                            <div class="form-group">
+                                <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
+
+                                    <button class="btn btn-success mx-3" type="submit">
+                                        Add to Customer Review
+                                    </button>
+
+                                    <a href="" class="btn btn-danger mx-3"
+                                       onclick="event.preventDefault(); document.getElementById('deleteFeedback-form').submit();">
+                                        Delete
+                                    </a>
+
+                                </div>
+                            </div>
+
+
+                        </form>
+
+                        <form id="deleteFeedback-form" action="{{ route('admin.feedbackDelete', $feedback->id) }}"
+                              method="POST"
+                              style="display: none;">
+                            @method('DELETE')
+                            @csrf
+                        </form>
+
+
+                    </div>
+                </div>
+
             @endif
 
             @if ($page == 'approveSellerMore')
@@ -523,6 +684,7 @@
                             <form id="rejectSeller-form" action="{{ route('admin.sellerReject', $user->id) }}"
                                   method="POST"
                                   style="display: none;">
+                                @method('DELETE')
                                 @csrf
                             </form>
                         @endif
@@ -803,6 +965,104 @@
             @endif
 
             {{-- CMS Menu --}}
+            @if($page == 'popupForm')
+                <div class="col-md-9 content">
+                    <div class="dashhead">
+                        <div class="dashhead-titles">
+                            <h6 class="dashhead-subtitle">Dashboards</h6>
+                            <h2 class="dashhead-title">Homescreen Pop Up Form</h2>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="content-panel col-md-9 content">
+                        @if($popup)
+                            <h4 class="dashhead-title">Current Pop Up</h4>
+                            <img src="{{ route('cmsPopUpImage.show', $popup->image)}}" alt="POP UP" class="img-fluid">
+                            <hr>
+                        @endif
+                        <div class="table-responsive">
+                            <form class="form-horizontal" method="POST"
+                                  action="{{ route('admincms.popupStore') }}"
+                                  enctype="multipart/form-data">
+                                @csrf
+                                <fieldset class="fieldset">
+                                    <div class="form-group avatar">
+                                        <label class="control-label" for="image">Select POP UP AD Image</label>
+                                        <div class="form-inline col-md-10 col-sm-9 col-xs-12">
+                                            <input type="file" class="file-uploader pull-left" id="chosse-file"
+                                                   name="image"
+                                                   accept="image/*"
+                                                   required>
+                                            @error('image')
+                                            <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <hr>
+
+                                <div class="form-group">
+                                    <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
+                                        <button class="btn btn-primary"
+                                                type="submit">{{ $popup ? 'Update' : 'Save' }}</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if($page == 'navbarForm')
+                <div class="col-md-9 content">
+                    <div class="dashhead">
+                        <div class="dashhead-titles">
+                            <h6 class="dashhead-subtitle">Dashboards</h6>
+                            <h2 class="dashhead-title">Navbar Form</h2>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="content-panel col-md-9 content">
+                        <div class="table-responsive">
+                            <form class="form-horizontal" method="POST"
+                                  action="@if(count($navbar_data) > 0) {{ route('admincms.navbarUpdate', ['id'=> $navbar_data[0]->id] )}} @else{{ route('admincms.navbarStore')}} @endif"
+                                  enctype="multipart/form-data">
+                                @csrf
+                                <fieldset class="fieldset">
+                                    <div class="form-group avatar">
+                                        <label class="control-label" for="image">Select Brand Logo</label>
+                                        <div class="form-inline col-md-10 col-sm-9 col-xs-12">
+                                            <input type="file" class="file-uploader pull-left" id="chosse-file"
+                                                   name="image"
+                                                   accept="image/*"
+                                                   required>
+                                            @error('image')
+                                            <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <hr>
+
+                                <div class="form-group">
+                                    <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if($page == 'bannerForm')
                 <div class="col-md-9 content">
                     <div class="dashhead">
@@ -998,7 +1258,7 @@
                                     <div class="form-group">
                                         <label class="control-label">Designation</label>
 
-                                        <input type="text" class="form-control" name="designation" >
+                                        <input type="text" class="form-control" name="designation">
                                         @error('designation')
                                         <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -1090,6 +1350,105 @@
                     </div>
                 </div>
 
+            @endif
+
+            @if($page == 'footerForm')
+                <div class="col-md-9 content">
+                    <div class="dashhead">
+                        <div class="dashhead-titles">
+                            <h6 class="dashhead-subtitle">Dashboards</h6>
+                            <h2 class="dashhead-title">Footer Form</h2>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="content-panel col-md-9 content">
+                        <div class="table-responsive">
+                            <form class="form-horizontal" method="POST"
+                                  action="@if(count($footer_data) > 0) {{ route('admincms.footerUpdate', ['id'=> $footer_data[0]->id] )}} @else{{ route('admincms.footerStore')}} @endif"
+                                  enctype="multipart/form-data">
+                                @csrf
+                                <fieldset class="fieldset">
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            Footer Description
+                                        </label>
+
+                                        <input type="text" class="form-control" name="footer_description"
+                                               value="{{ $footer_data[0]->footer_description }}" required>
+                                        @error('footer_description')
+                                        <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Contact Number</label>
+
+                                        <input type="number" class="form-control" name="contact_number"
+                                               value="{{ $footer_data[0]->contact_number }}" required>
+                                        @error('contact_number')
+                                        <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Contact Email</label>
+
+                                        <input type="email" class="form-control" name="contact_email"
+                                               value="{{ $footer_data[0]->contact_email }}" required>
+                                        @error('contact_email')
+                                        <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                                        @enderror
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            Get In Touch | Location
+                                        </label>
+                                        <textarea name="location" class="form-control" rows="4" cols="50"
+                                                  required>{{ $footer_data[0]->location }}</textarea>
+
+                                        @error('location')
+                                        <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            Footer Copyright Text
+                                        </label>
+
+                                        <input type="text" class="form-control" name="footer_copyright"
+                                               value="{{ $footer_data[0]->footer_copyright }}" required>
+                                        @error('footer_copyright')
+                                        <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                                        @enderror
+                                    </div>
+
+                                </fieldset>
+
+                                <hr>
+
+                                <div class="form-group">
+                                    <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
             @endif
 
             @if($page == 'bannerAll')

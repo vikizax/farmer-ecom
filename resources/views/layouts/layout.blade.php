@@ -74,7 +74,7 @@
         function scroll() {
 
             // Check the menus offset.
-            if ($(window).scrollTop() >= origOffsetY) {
+            if ($(window).scrollTop() >= 60 && $(window).hasClass('fixed-top') == false) {
 
                 //If it is indeed beyond the offset, affix it to the top.
                 $(menu).addClass('fixed-top');
@@ -94,14 +94,20 @@
     });
 </script>
 
-<body class={{ Request::is('login', 'register') ? 'signupBody' : ''  }}>
+<body class="{{ Request::is('login', 'register') ? 'signupBody' : ''  }}"
+      style="{{ Request::is('contactus') ? 'background: antiquewhite;': '' }}">
+@include('sweetalert::alert')
 <div class={{ Request::is('account') ? '' : 'wrapper'  }}>
     @unless (Request::is('login', 'register'))
         <header>
             <nav
                 class="navbar navbar-expand-lg navbar-light p-3 bg-nav bg-light shadow-sm navapply">
                 <div class="container">
-                    <a class="navbar-brand text-success" href="{{route('home')}}"><strong>VEG&FRUITS</strong></a>
+                    <a class="navbar-brand" href="{{route('home')}}">
+                        <img
+                            src="{{ route('cmsNavbarBrandImage.show', \App\CmsNavbar::first()->image) }}"
+                            style="width: 110px; height: 32px;"
+                            alt="brand-logo`"></a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
                             aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -132,9 +138,7 @@
                                         <a class="dropdown-item" href="{{route('product.index', 'All')}}">Products</a>
                                     </div>
                                 </li>
-                                {{--                            <li class="nav-item mr-4">--}}
-                                {{--                                <a class="nav-link" href="#">Contact</a>--}}
-                                {{--                            </li>--}}
+
                                 <li class="nav-item mr-4">
                                     <a class="nav-link" href="{{ route('login') }}">Login</a>
                                 </li>
@@ -144,6 +148,7 @@
                                         <a class="nav-link" href="{{ route('register') }}">Signup</a>
                                     </li>
                                 @endif
+
                             @else
                                 <li class="nav-item mr-4 dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button"
@@ -191,6 +196,9 @@
 
                             @endguest
 
+                            <li class="nav-item mr-4">
+                                <a class="nav-link" href="{{ route('contactus.create') }}">Contact Us</a>
+                            </li>
 
                         </ul>
                     </div>
@@ -202,6 +210,7 @@
         @include('flash-message')
         {{-- main content --}}
         @yield('content')
+
     </main>
 </div>
 
@@ -222,11 +231,9 @@
                         <!-- Single Widget -->
                         <div class="single-footer about">
 
-                            <p class="text1">Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, magna
-                                eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor,
-                                facilisis luctus, metus.</p>
+                            <p class="text1">{{ $footer_content->footer_description }}</p>
                             <p class="call">Got Question? Call us 24/7<span><a
-                                        href="tel:123456789">+0123 456 789</a></span></p>
+                                        href="tel:123456789">+91 {{ $footer_content->contact_number }}</a></span></p>
                         </div>
                         <!-- End Single Widget -->
                     </div>
@@ -261,14 +268,13 @@
                     <div class="col-lg-3 col-md-6 col-12">
                         <!-- Single Widget -->
                         <div class="single-footer social">
-                            <h4>Get In Tuch</h4>
+                            <h4>Get In Touch</h4>
                             <!-- Single Widget -->
                             <div class="contact">
                                 <ul>
-                                    <li>NO. 342 - London Oxford Street.</li>
-                                    <li>012 United Kingdom.</li>
-                                    <li>info@eshop.com</li>
-                                    <li>+032 3456 7890</li>
+                                    <li>{{ $footer_content->location }}</li>
+                                    <li>{{ $footer_content->contact_email }}</li>
+                                    <li>+91 {{ $footer_content->contact_number }}</li>
                                 </ul>
                             </div>
                             <!-- End Single Widget -->
@@ -289,14 +295,14 @@
             <div class="container">
                 <div class="inner">
                     <div class="row">
-                        <div class="col-lg-6 col-12">
-                            @copyRight
+                        <div class="col-12 text-center">
+                            {{ $footer_content->footer_copyright }}
                         </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="right">
+                        {{--                        <div class="col-lg-6 col-12">--}}
+                        {{--                            <div class="right">--}}
 
-                            </div>
-                        </div>
+                        {{--                            </div>--}}
+                        {{--                        </div>--}}
                     </div>
                 </div>
             </div>

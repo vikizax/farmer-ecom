@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\CmsBanner;
 use App\CmsBottomAd;
 use App\CmsCustomerReview;
+use App\CmsFooter;
+use App\CmsNavbar;
+use App\CmsPopUp;
 use App\CmsTopAd;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -61,6 +64,20 @@ class AdminCMSController extends Controller
     {
 
         switch ($request->path()) {
+            case 'admin/CmsPopUp' :
+
+                $popup = CmsPopUp::first();
+
+                return view('admin.dashboard')->with(['page' => 'popupForm', 'popup' => $popup]);
+
+                break;
+
+            case 'admin/CmsNavbar':
+                $navbar_data = CmsNavbar::get();
+
+                return view('admin.dashboard')->with(['page' => 'navbarForm', 'navbar_data' => $navbar_data]);
+                break;
+
             case 'admin/CmsBanner':
                 return view('admin.dashboard')->with('page', 'bannerForm');
                 break;
@@ -78,7 +95,10 @@ class AdminCMSController extends Controller
                 break;
             case 'admin/CmsFooter':
 
-                return view('admin.dashboard')->with('page', 'footerForm');
+                $footer_data = CmsFooter::get();
+
+                return view('admin.dashboard')->with(['page' => 'footerForm', 'footer_data' => $footer_data]);
+
                 break;
             default:
                 abort(404);
@@ -102,6 +122,59 @@ class AdminCMSController extends Controller
     public function store(Request $request)
     {
         switch ($request->path()) {
+            case 'admin/CmsPopUpStore' :
+
+                $popup = CmsPopUp::first();
+
+                if($popup) {
+                    // delete the pop up image from disk
+                    Storage::delete("popup_ad_image/" . $popup->image);
+
+                    $popup->delete();
+                }
+
+
+                $popup_validator = Validator::make($request->all(), [
+                    'image' => 'required|mimes:jpg,jpeg,png|max:4096',
+                ], $messages = [
+                    'image' => 'Please upload image only',
+                ]);
+
+                if ($popup_validator->fails()) {
+                    return back()->withErrors($popup_validator->messages());
+                }
+
+
+                $img_name = $request->file('image')->store('popup_ad_image');
+
+                CmsPopUp::create([
+                    'image' => explode('/', $img_name)[1]
+                ]);
+
+                return redirect()->back()->with('success', 'Pop Up Ad Updated');
+
+                break;
+
+            case 'admin/CmsNavbarStore':
+                $navbar_validator = Validator::make($request->all(), [
+                    'image' => 'required|mimes:jpg,jpeg,png|max:4096',
+                ], $messages = [
+                    'image' => 'Please upload image only',
+                ]);
+
+                if ($navbar_validator->fails()) {
+                    return back()->withErrors($navbar_validator->messages());
+                }
+
+                $img_name = $request->file('image')->store('navbar_brand_image');
+
+                CmsNavbar::create([
+                    'image' => explode('/', $img_name)[1]
+                ]);
+
+                return redirect()->back()->with('success', 'Brand Image Added');
+
+                break;
             case 'admin/CmsBannerStore' :
 
                 $banners = CmsBanner::get();
@@ -200,7 +273,7 @@ class AdminCMSController extends Controller
                         'name' => $request->name,
                         'review' => $request->review,
                         'image' => explode('/', $img_name)[1],
-                        'designation' =>  $request->designation ? $request->designation : 'Customer'
+                        'designation' => $request->designation ? $request->designation : 'Customer'
                     ];
                 }
 
@@ -236,6 +309,33 @@ class AdminCMSController extends Controller
                 ]);
 
                 return redirect()->back()->with('success', 'Bottom Ad Added Success');
+
+                break;
+            case 'admin/CmsFooterStore':
+
+//                dd('store', $request->all());
+
+                $footer_validator = Validator::make($request->all(), [
+                    'footer_description' => 'required|string|max:255',
+                    'footer_copyright' => 'required|string|max:255',
+                    'location' => 'required|string|max:255',
+                    'contact_email' => 'required|email|max:255',
+                    'contact_number' => 'required|integer|digits:10'
+                ]);
+
+                if ($footer_validator->fails()) {
+                    return back()->withInput()->withErrors($footer_validator->messages());
+                }
+
+                CmsFooter::create([
+                    'footer_description' => $request->footer_description,
+                    'footer_copyright' => $request->footer_copyright,
+                    'contact_number' => $request->contact_number,
+                    'contact_email' => $request->contact_email,
+                    'location' => $request->location
+                ]);
+
+                return back()->with('success', 'Footer Content Saved');
 
                 break;
             default:
@@ -275,7 +375,61 @@ class AdminCMSController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if (strpos($request->path(), 'CmsFooterUpdate') !== false) {
+            $footer_validator = Validator::make($request->all(), [
+                'footer_description' => 'required|string|max:255',
+                'footer_copyright' => 'required|string|max:255',
+                'location' => 'required|string|max:255',
+                'contact_email' => 'required|email',
+                'contact_number' => 'required|integer|digits:10'
+            ], $messages = [
+                'integer' => 'Contact number is not valid | Must not start with 0 | Must be of 10 digits'
+            ]);
+
+            if ($footer_validator->fails()) {
+                return back()->withInput()->withErrors($footer_validator->messages());
+            }
+
+            $footer_data = CmsFooter::findOrFail($id);
+
+            $footer_data->footer_description = $request->footer_description;
+            $footer_data->footer_copyright = $request->footer_copyright;
+            $footer_data->contact_number = $request->contact_number;
+            $footer_data->contact_email = $request->contact_email;
+            $footer_data->location = $request->location;
+
+            $footer_data->update();
+
+            return back()->with('success', 'Footer Content Updated');
+
+        }
+
+        if (strpos($request->path(), 'CmsNavbarUpdate') !== false) {
+            $navbar_validator = Validator::make($request->all(), [
+                'image' => 'required|mimes:jpg,jpeg,png|max:4096',
+            ], $messages = [
+                'image' => 'Please upload image only',
+            ]);
+
+            if ($navbar_validator->fails()) {
+                return back()->withErrors($navbar_validator->messages());
+            }
+
+            $img_name = $request->file('image')->store('navbar_brand_image');
+
+            $nav = CmsNavbar::findOrFail($id);
+
+            // delete the navbar brand image from disk
+            Storage::delete("navbar_brand_image/" . $nav->image);
+
+            // update with new image stored
+            $nav->image = explode('/', $img_name)[1];
+            $nav->update();
+
+            return back()->with('success', 'Navbar Brand Image Updated');
+
+        }
+
     }
 
     /**
@@ -318,7 +472,7 @@ class AdminCMSController extends Controller
             $review = CmsCustomerReview::findOrFail($id);
 
             // delete the customer review image from disk
-            if($review->image != 'user.png') {
+            if ($review->image != 'user.png') {
                 Storage::delete("customer_review_image/" . $review->image);
             }
 

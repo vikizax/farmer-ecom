@@ -153,7 +153,7 @@
 
                         <p class="text-muted font-weight-bold">
                             Return to
-                            <a href="{{ url('/') }}" class="text-primary ml-2">Home</a>
+                            <a href="{{ route('home') }}" class="text-primary ml-2">Home</a>
                         </p>
                     </div>
                 </div>

@@ -5,12 +5,21 @@ namespace App\Http\Controllers;
 use App\CmsBanner;
 use App\CmsBottomAd;
 use App\CmsCustomerReview;
+use App\CmsFooter;
+use App\CmsPopUp;
 use App\CmsTopAd;
+use App\Feedback;
 use App\Product;
+use App\Seller;
 use App\User;
+
+use App\UserOrders;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use RealRashid\SweetAlert\Facades\Alert;
+
 
 class UserHomePageController extends Controller
 {
@@ -19,7 +28,7 @@ class UserHomePageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // for featured products
         $counter = 0;
@@ -91,8 +100,7 @@ class UserHomePageController extends Controller
                 'best_selling_products' => $best_selling_products
             ];
 
-        }
-        else {
+        } else {
             foreach ($orders as $key => $order) {
                 $data_set_product[$key] = Product::where('id', $order->product_id)->first();
             }
@@ -119,7 +127,67 @@ class UserHomePageController extends Controller
 
         }
 
+        $feedback_count = count(CmsCustomerReview::get());
+
+        $orders_count = count(UserOrders::get());
+
+        $product_count = count(Product::get());
+
+        $seller_count = count(Seller::get());
+
+        $data['footer_content'] = CmsFooter::first();
+
+        $data['feedback_count'] = $feedback_count;
+        $data['order_count'] = $orders_count;
+        $data['product_count'] = $product_count;
+        $data['seller_count'] = $seller_count;
+
+        if ($request->is('/')) {
+            $popup = CmsPopUp::first()->image;
+            alert()->image(null, null,route('cmsPopUpImage.show', $popup), '', '')->persistent();
+
+
+        }
+
+
         return view('user.home')
             ->with($data);
+
+    }
+
+    public function create(Request $request)
+    {
+        if (strpos($request->path(), 'contactus') !== false) {
+            return view('user.feedback');
+        }
+    }
+
+    public function store(Request $request)
+    {
+        if (strpos($request->path(), 'contactusStore') !== false) {
+
+            $feedback_validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'feedback' => 'required|string|max:800',
+                'contact_number' => 'required|integer|digits:10',
+                'contact_email' => 'required|email'
+            ], $messages = [
+                'integer' => 'Contact number is not valid | Must not start with 0 | Must be of 10 digits'
+            ]);
+
+            if ($feedback_validator->fails()) {
+                return back()->withInput()->withErrors($feedback_validator->messages());
+            }
+
+            Feedback::create([
+                'name' => $request->name,
+                'feedback' => $request->feedback,
+                'contact_email' => $request->contact_email,
+                'contact_number' => $request->contact_number
+            ]);
+
+            return redirect()->route('home')->with('success', 'Feedback Submitted');
+
+        }
     }
 }
